@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { db } from '../firebase/config';
+import { collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { useAuth } from '../contexts/AuthContext';
 
 const GUIDED_PROMPTS = [
   "How are you feeling today, and why?",
@@ -12,9 +15,42 @@ const GUIDED_PROMPTS = [
 
 const JournalPage = () => {
   const [showNewEntry, setShowNewEntry] = useState(false);
+  const [showEntriesList, setShowEntriesList] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [entryContent, setEntryContent] = useState('');
   const [currentPrompt, setCurrentPrompt] = useState('');
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedEntry, setSelectedEntry] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const { currentUser } = useAuth();
+
+  const loadEntries = useCallback(async () => {
+    try {
+      const entriesRef = collection(db, 'journal_entries');
+      const q = query(
+        entriesRef,
+        where('userId', '==', currentUser.uid),
+        orderBy('date', 'desc')
+      );
+
+      const querySnapshot = await getDocs(q);
+      const loadedEntries = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setEntries(loadedEntries);
+    } catch (error) {
+      console.error('Error loading entries:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    loadEntries();
+  }, [loadEntries]);
 
   const handleTypeSelect = (type) => {
     setSelectedType(type);
@@ -24,19 +60,144 @@ const JournalPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Save entry to storage/database
-    console.log({
-      type: selectedType,
-      content: entryContent,
-      prompt: currentPrompt,
-      date: new Date().toISOString()
-    });
-    setShowNewEntry(false);
-    setEntryContent('');
-    setSelectedType(null);
+    
+    try {
+      const newEntry = {
+        userId: currentUser.uid,
+        type: selectedType,
+        content: entryContent,
+        prompt: currentPrompt,
+        date: new Date().toISOString(),
+      };
+
+      console.log('Attempting to save entry:', newEntry);
+
+      const docRef = await addDoc(collection(db, 'journal_entries'), newEntry);
+      console.log('Entry saved with ID:', docRef.id);
+      
+      // Refresh entries
+      await loadEntries();
+
+      // Reset form
+      setShowNewEntry(false);
+      setEntryContent('');
+      setSelectedType(null);
+    } catch (error) {
+      console.error('Detailed error saving entry:', error);
+      alert(`Failed to save entry: ${error.message}`);
+    }
   };
+
+  const handleDeleteEntry = async (entryId, e) => {
+    e.stopPropagation(); // Prevent triggering parent click events
+    if (window.confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
+      try {
+        await deleteDoc(doc(db, 'journal_entries', entryId));
+        setEntries(entries.filter(entry => entry.id !== entryId));
+        setShowViewModal(false);
+        setSelectedEntry(null);
+      } catch (error) {
+        console.error('Error deleting entry:', error);
+        alert('Failed to delete entry: ' + error.message);
+      }
+    }
+  };
+
+  const ViewEntryModal = ({ entry, onClose }) => {
+    if (!entry) return null;
+
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>{entry.type === 'guided' ? 'Guided Entry' : 'Free Writing'}</h3>
+            <button onClick={onClose} className="close-btn">&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="entry-date">
+              {new Date(entry.date).toLocaleDateString()} at {new Date(entry.date).toLocaleTimeString()}
+            </div>
+            {entry.prompt && (
+              <div className="entry-prompt">
+                <strong>Prompt:</strong> {entry.prompt}
+              </div>
+            )}
+            <div className="entry-content">
+              {entry.content}
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button 
+              onClick={(e) => handleDeleteEntry(entry.id, e)}
+              className="delete-btn"
+            >
+              Delete Entry
+            </button>
+            <button onClick={onClose} className="close-modal-btn">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const EntriesListView = () => (
+    <div className="entries-view">
+      <div className="entries-header">
+        <h2>Your Journal Entries</h2>
+        <button 
+          className="back-to-options-btn"
+          onClick={() => setShowEntriesList(false)}
+        >
+          Back to Journal Options
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="loading">Loading entries...</div>
+      ) : entries.length === 0 ? (
+        <div className="no-entries">
+          <p>No entries yet. Start journaling!</p>
+          <button 
+            className="start-journaling-btn"
+            onClick={() => setShowEntriesList(false)}
+          >
+            Create New Entry
+          </button>
+        </div>
+      ) : (
+        <div className="entries-grid">
+          {entries.map(entry => (
+            <div key={entry.id} className="entry-card">
+              <div className="entry-date">
+                {new Date(entry.date).toLocaleDateString()}
+              </div>
+              <div className="entry-type">
+                {entry.type === 'guided' ? 'Guided Entry' : 'Free Writing'}
+              </div>
+              {entry.prompt && (
+                <div className="entry-prompt">{entry.prompt}</div>
+              )}
+              <div className="entry-preview">
+                {entry.content.length > 100 
+                  ? `${entry.content.substring(0, 100)}...` 
+                  : entry.content}
+              </div>
+              <button
+                className="delete-entry-btn"
+                onClick={(e) => handleDeleteEntry(entry.id, e)}
+              >
+                Delete Entry
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="journal-container">
@@ -46,7 +207,9 @@ const JournalPage = () => {
         <h1>Journal Space</h1>
       </div>
 
-      {!showNewEntry ? (
+      {showEntriesList ? (
+        <EntriesListView />
+      ) : !showNewEntry ? (
         <div className="entry-types">
           <button 
             className="entry-type-btn"
@@ -63,6 +226,14 @@ const JournalPage = () => {
             <span>🎯</span>
             <span>Guided Prompt</span>
             <p className="type-description">Respond to thought-provoking questions</p>
+          </button>
+          <button 
+            className="entry-type-btn"
+            onClick={() => setShowEntriesList(true)}
+          >
+            <span>📚</span>
+            <span>View & Edit Entries</span>
+            <p className="type-description">Browse and manage your journal entries</p>
           </button>
         </div>
       ) : (
@@ -111,6 +282,16 @@ const JournalPage = () => {
             </div>
           </form>
         </div>
+      )}
+
+      {showViewModal && (
+        <ViewEntryModal 
+          entry={selectedEntry} 
+          onClose={() => {
+            setShowViewModal(false);
+            setSelectedEntry(null);
+          }}
+        />
       )}
     </div>
   );
