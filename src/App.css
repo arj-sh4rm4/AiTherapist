@@ -477,3 +477,173 @@ main {
     padding: 1rem;
   }
 }
+
+/* Journal Styles */
+.journal-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: calc(100vh - 100px); /* Account for header */
+  background-color: #f8fafc;
+}
+
+.journal-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.journal-header h1 {
+  font-size: 2.5rem;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.entry-types {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Changed to 2 columns */
+  gap: 2rem;
+  margin: 0 auto;
+  max-width: 700px; /* Limit maximum width */
+}
+
+.entry-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 2rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.entry-type-btn:hover {
+  transform: translateY(-2px);
+  border-color: #4299e1;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.1);
+}
+
+.entry-type-btn span:first-child {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.entry-type-btn span:nth-child(2) {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.type-description {
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  color: #718096;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.entry-form-container {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 2rem;
+}
+
+.entry-form-container h2 {
+  color: #2d3748;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+.prompt-container {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.prompt-text {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.new-prompt-btn {
+  background: none;
+  border: none;
+  color: #4299e1;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+}
+
+.new-prompt-btn:hover {
+  text-decoration: underline;
+}
+
+.entry-textarea {
+  width: 100%;
+  min-height: 300px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.entry-textarea:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66,153,225,0.1);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  color: #4a5568;
+  cursor: pointer;
+}
+
+.save-btn {
+  padding: 0.75rem 1.5rem;
+  background: #4299e1;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.save-btn:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .entry-types {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .journal-container {
+    padding: 1.5rem;
+  }
+
+  .entry-type-btn {
+    padding: 2rem 1.5rem;
+  }
+}
