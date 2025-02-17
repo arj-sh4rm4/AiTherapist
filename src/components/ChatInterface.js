@@ -3,6 +3,7 @@ import TypingIndicator from './TypingIndicator';
 import EmergencyResources from './EmergencyResources';
 import { FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import speechService from '../utils/speechService';
+import VoiceInput from './VoiceInput';
 
 const suggestedResponses = [
   {
@@ -122,9 +123,12 @@ const ChatInterface = ({ messages, onSendMessage, isTyping }) => {
           placeholder="Type your message..."
           disabled={isTyping}
         />
-        <button type="submit" disabled={isTyping || !inputText.trim()}>
-          {isTyping ? 'Thinking...' : 'Send'}
-        </button>
+        <div className="input-buttons">
+          <VoiceInput onMessageReceived={onSendMessage} />
+          <button type="submit" disabled={isTyping || !inputText.trim()}>
+            {isTyping ? 'Thinking...' : 'Send'}
+          </button>
+        </div>
       </form>
     </div>
   );

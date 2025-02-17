@@ -1,10 +1,53 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import ChatInterface from './components/ChatInterface';
 import VoiceInput from './components/VoiceInput';
 import speechService from './utils/speechService';
 
-function App() {
+// Placeholder components for new sections
+const HomePage = () => (
+  <div className="home-container">
+    <h1>Welcome to AI Therapy Assistant</h1>
+    <div className="features-grid">
+      <Link to="/chat" className="feature-card">
+        <div className="feature-icon">💭</div>
+        <h2>AI Therapist Chat</h2>
+        <p>Have a supportive conversation with our AI therapist</p>
+      </Link>
+      
+      <Link to="/journal" className="feature-card">
+        <div className="feature-icon">📔</div>
+        <h2>Journal Space</h2>
+        <p>Record your thoughts and track your emotional journey</p>
+      </Link>
+      
+      <Link to="/tools" className="feature-card">
+        <div className="feature-icon">🧘‍♀️</div>
+        <h2>Coping Tools</h2>
+        <p>Access helpful exercises and relaxation techniques</p>
+      </Link>
+    </div>
+  </div>
+);
+
+const JournalPage = () => (
+  <div className="journal-container">
+    <h1>Journal Space</h1>
+    <p>Journal feature coming soon...</p>
+    <Link to="/" className="back-button">Back to Home</Link>
+  </div>
+);
+
+const ToolsPage = () => (
+  <div className="tools-container">
+    <h1>Coping Tools</h1>
+    <p>Coping tools feature coming soon...</p>
+    <Link to="/" className="back-button">Back to Home</Link>
+  </div>
+);
+
+const TherapistChat = () => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -102,19 +145,34 @@ Provide a supportive, natural response as if you're speaking to the client in pe
   }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>AI Therapist</h1>
-      </header>
-      <main>
-        <ChatInterface 
-          messages={messages} 
-          onSendMessage={handleNewMessage}
-          isTyping={isTyping}
-        />
-        <VoiceInput onMessageReceived={handleNewMessage} />
-      </main>
+    <div className="chat-page">
+      <Link to="/" className="back-button">Back to Home</Link>
+      <ChatInterface 
+        messages={messages} 
+        onSendMessage={handleNewMessage}
+        isTyping={isTyping}
+      />
     </div>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <Link to="/" className="home-link">AI Therapy Assistant</Link>
+        </header>
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/chat" element={<TherapistChat />} />
+            <Route path="/journal" element={<JournalPage />} />
+            <Route path="/tools" element={<ToolsPage />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
