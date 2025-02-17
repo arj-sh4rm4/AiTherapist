@@ -4,6 +4,7 @@ import './App.css';
 import ChatInterface from './components/ChatInterface';
 import VoiceInput from './components/VoiceInput';
 import speechService from './utils/speechService';
+import JournalPage from './components/JournalPage';
 
 // Placeholder components for new sections
 const HomePage = () => (
@@ -31,14 +32,6 @@ const HomePage = () => (
   </div>
 );
 
-const JournalPage = () => (
-  <div className="journal-container">
-    <h1>Journal Space</h1>
-    <p>Journal feature coming soon...</p>
-    <Link to="/" className="back-button">Back to Home</Link>
-  </div>
-);
-
 const ToolsPage = () => (
   <div className="tools-container">
     <h1>Coping Tools</h1>
@@ -47,10 +40,7 @@ const ToolsPage = () => (
   </div>
 );
 
-const TherapistChat = () => {
-  const [messages, setMessages] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
-
+const TherapistChat = ({ messages, isTyping, onNewMessage }) => {
   const getAIResponse = async (userMessage, messageHistory) => {
     try {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.REACT_APP_PALM_API_KEY}`, {
@@ -108,7 +98,7 @@ Provide a supportive, natural response as if you're speaking to the client in pe
     }
   };
 
-  const handleNewMessage = async (message, isUser = true) => {
+  const handleLocalMessage = async (message, isUser = true) => {
     if (isUser) {
       speechService.stop();
     }
@@ -119,21 +109,18 @@ Provide a supportive, natural response as if you're speaking to the client in pe
       timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    onNewMessage(newMessage);
 
     if (isUser) {
-      setIsTyping(true);
       try {
         const aiResponse = await getAIResponse(message, messages);
-        setMessages(prev => [...prev, {
+        onNewMessage({
           content: aiResponse,
           sender: 'therapist',
           timestamp: new Date().toISOString(),
-        }]);
+        }, false);
       } catch (error) {
         console.error('Error in conversation:', error);
-      } finally {
-        setIsTyping(false);
       }
     }
   };
@@ -149,7 +136,7 @@ Provide a supportive, natural response as if you're speaking to the client in pe
       <Link to="/" className="back-button">Back to Home</Link>
       <ChatInterface 
         messages={messages} 
-        onSendMessage={handleNewMessage}
+        onSendMessage={handleLocalMessage}
         isTyping={isTyping}
       />
     </div>
@@ -157,6 +144,9 @@ Provide a supportive, natural response as if you're speaking to the client in pe
 };
 
 function App() {
+  const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+
   return (
     <Router>
       <div className="App">
@@ -166,7 +156,16 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/chat" element={<TherapistChat />} />
+            <Route path="/chat" element={
+              <TherapistChat 
+                messages={messages} 
+                isTyping={isTyping} 
+                onNewMessage={(message, isUser) => {
+                  setMessages(prev => [...prev, message]);
+                  setIsTyping(isUser);
+                }}
+              />
+            } />
             <Route path="/journal" element={<JournalPage />} />
             <Route path="/tools" element={<ToolsPage />} />
           </Routes>
