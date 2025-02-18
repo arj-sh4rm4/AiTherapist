@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-ro
 import './App.css';
 import ChatInterface from './components/ChatInterface';
 import VoiceInput from './components/VoiceInput';
-import speechService from './utils/speechService';
 import JournalPage from './components/JournalPage';
 import NavBar from './components/NavBar';
 import LoginPage from './components/LoginPage';
@@ -11,6 +10,7 @@ import SignupPage from './components/SignupPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from './firebase/config';
+import speechService from './utils/speechService';
 
 // Placeholder components for new sections
 const HomePage = () => (
@@ -48,6 +48,7 @@ const ToolsPage = () => (
 
 const TherapistChat = ({ messages, isTyping, onNewMessage }) => {
   const { currentUser } = useAuth();
+  const [isMuted, setIsMuted] = useState(false);
 
   const getAIResponse = async (userMessage, messageHistory) => {
     try {
@@ -91,9 +92,15 @@ Provide a supportive, natural response as if you're speaking to the client in pe
       console.log('API Response:', data);
       
       if (data.candidates && data.candidates[0]) {
-        const response = data.candidates[0].content.parts[0].text;
-        speechService.speak(response);
-        return response;
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
+        // Only speak if not muted
+        if (!isMuted) {
+          console.log("Speaking response:", aiResponse); // Debug log
+          speechService.speak(aiResponse);
+        }
+        
+        return aiResponse;
       }
 
       throw new Error('No valid response received');
@@ -101,16 +108,14 @@ Provide a supportive, natural response as if you're speaking to the client in pe
     } catch (error) {
       console.error('Error:', error);
       const fallbackResponse = `I understand you're going through a difficult time. Let's focus on what's troubling you most right now. Would you like to explore some coping strategies together?`;
-      speechService.speak(fallbackResponse);
+      if (!isMuted) {
+        speechService.speak(fallbackResponse);
+      }
       return fallbackResponse;
     }
   };
 
   const handleLocalMessage = async (message, isUser = true) => {
-    if (isUser) {
-      speechService.stop();
-    }
-
     const newMessage = {
       content: message,
       sender: isUser ? 'user' : 'therapist',
@@ -144,12 +149,6 @@ Provide a supportive, natural response as if you're speaking to the client in pe
     }
   };
 
-  useEffect(() => {
-    return () => {
-      speechService.stop();
-    };
-  }, []);
-
   return (
     <div className="chat-page">
       <Link to="/" className="back-button">Back to Home</Link>
@@ -157,6 +156,8 @@ Provide a supportive, natural response as if you're speaking to the client in pe
         messages={messages} 
         onSendMessage={handleLocalMessage}
         isTyping={isTyping}
+        isMuted={isMuted}
+        onMuteToggle={setIsMuted}
       />
     </div>
   );

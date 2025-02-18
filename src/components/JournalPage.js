@@ -117,7 +117,8 @@ const JournalPage = () => {
           </div>
           <div className="modal-body">
             <div className="entry-date">
-              {new Date(entry.date).toLocaleDateString()} at {new Date(entry.date).toLocaleTimeString()}
+              {new Date(entry.date).toLocaleDateString()} at{' '}
+              {new Date(entry.date).toLocaleTimeString()}
             </div>
             {entry.prompt && (
               <div className="entry-prompt">
@@ -129,12 +130,6 @@ const JournalPage = () => {
             </div>
           </div>
           <div className="modal-footer">
-            <button 
-              onClick={(e) => handleDeleteEntry(entry.id, e)}
-              className="delete-btn"
-            >
-              Delete Entry
-            </button>
             <button onClick={onClose} className="close-modal-btn">
               Close
             </button>
@@ -147,13 +142,15 @@ const JournalPage = () => {
   const EntriesListView = () => (
     <div className="entries-view">
       <div className="entries-header">
-        <h2>Your Journal Entries</h2>
-        <button 
-          className="back-to-options-btn"
-          onClick={() => setShowEntriesList(false)}
-        >
-          Back to Journal Options
-        </button>
+        <div className="entries-header-top">
+          <h2>Your Journal Entries</h2>
+          <button 
+            className="back-to-options-btn"
+            onClick={() => setShowEntriesList(false)}
+          >
+            Back to Journal Options
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -171,27 +168,23 @@ const JournalPage = () => {
       ) : (
         <div className="entries-grid">
           {entries.map(entry => (
-            <div key={entry.id} className="entry-card">
+            <div 
+              key={entry.id} 
+              className="entry-card"
+              onClick={() => {
+                setSelectedEntry(entry);
+                setShowViewModal(true);
+              }}
+            >
               <div className="entry-date">
-                {new Date(entry.date).toLocaleDateString()}
-              </div>
-              <div className="entry-type">
-                {entry.type === 'guided' ? 'Guided Entry' : 'Free Writing'}
-              </div>
-              {entry.prompt && (
-                <div className="entry-prompt">{entry.prompt}</div>
-              )}
-              <div className="entry-preview">
-                {entry.content.length > 100 
-                  ? `${entry.content.substring(0, 100)}...` 
-                  : entry.content}
+                {new Date(entry.date).toLocaleDateString()} at{' '}
+                {new Date(entry.date).toLocaleTimeString()}
               </div>
               <button
                 className="delete-entry-btn"
                 onClick={(e) => handleDeleteEntry(entry.id, e)}
-              >
-                Delete Entry
-              </button>
+                aria-label="Delete entry"
+              />
             </div>
           ))}
         </div>
