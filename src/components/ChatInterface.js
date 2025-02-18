@@ -24,11 +24,10 @@ const suggestedResponses = [
   }
 ];
 
-const ChatInterface = ({ messages, onSendMessage, isTyping }) => {
+const ChatInterface = ({ messages, onSendMessage, isTyping, isMuted, onMuteToggle }) => {
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -59,7 +58,7 @@ const ChatInterface = ({ messages, onSendMessage, isTyping }) => {
   );
 
   const toggleMute = () => {
-    setIsMuted(!isMuted);
+    onMuteToggle(!isMuted);
     if (!isMuted) {
       speechService.stop();
     }
