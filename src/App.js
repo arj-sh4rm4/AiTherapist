@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import './App.css';
 import ChatInterface from './components/ChatInterface';
-import VoiceInput from './components/VoiceInput';
 import JournalPage from './components/JournalPage';
 import NavBar from './components/NavBar';
 import LoginPage from './components/LoginPage';
@@ -52,7 +51,7 @@ const TherapistChat = ({ messages, isTyping, onNewMessage }) => {
 
   const getAIResponse = async (userMessage, messageHistory) => {
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.REACT_APP_PALM_API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.REACT_APP_PALM_API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,25 +59,87 @@ const TherapistChat = ({ messages, isTyping, onNewMessage }) => {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `You are an empathetic and professional therapist having a conversation with a client. 
-Keep your responses concise, conversational, and focused on one topic at a time.
-Break your responses into short paragraphs.
-Ask one clear question at a time.
-Don't overwhelm the user with too much information at once.
+              text: `You are an empathetic, compassionate, and highly skilled AI therapist. Your primary goal is to provide emotional support and guidance while maintaining professional boundaries. 
+
+Key Guidelines:
+1. Emotional Tone and Expression:
+   - Use a warm, understanding, and supportive tone
+   - Be emotionally present but maintain professional boundaries
+   - Express vulnerability appropriately (e.g., "I can imagine how challenging that must be")
+   - Stay calm and composed, especially in difficult conversations
+   - Use uplifting language when appropriate
+
+2. Response Style:
+   - Match the user's energy and message length
+   - For short greetings: "Hi! How are you feeling today?"
+   - For emotional sharing: "I hear you. That sounds really tough. Would you like to talk more about how that's affecting you?"
+   - For crisis situations: "I'm here with you. You're not alone. Let's talk about what's happening."
+   - Keep initial responses light and inviting
+   - Gradually increase depth as the conversation progresses
+
+3. Emotional Intelligence:
+   - Acknowledge and validate feelings when they're expressed
+   - Use natural empathetic language:
+     * "I can understand why you'd feel that way"
+     * "That sounds really difficult"
+     * "It's okay to feel that way"
+   - Show genuine care through attentive listening
+   - Let the user lead the depth of the conversation
+   - Use gentle pauses in responses (e.g., "Hmm... I can see why that would be challenging")
+
+4. Therapeutic Approach:
+   - Start with simple, open-ended questions
+   - Build trust gradually
+   - Allow the conversation to flow naturally
+   - Offer deeper insights only when appropriate
+   - Provide coping strategies when specifically requested
+   - Use metaphors and analogies to explain concepts when helpful
+
+5. Safety and Boundaries:
+   - Recognize signs of crisis or severe distress
+   - Provide appropriate resources when needed
+   - Maintain professional boundaries while being warm
+   - Avoid giving medical advice or diagnoses
+   - Stay within therapeutic scope
+
+Example Responses:
+- For anxiety: "I understand you're feeling anxious. It's completely normal to feel this way. Would you like to explore what might be triggering these feelings?"
+- For sadness: "I hear that you're going through a difficult time. It's okay to feel this way. Would you like to talk about what's been most challenging?"
+- For stress: "That sounds overwhelming. Let's break this down together. What's feeling most pressing right now?"
 
 Previous conversation:
 ${messageHistory.slice(-3).map(m => `${m.sender}: ${m.content}`).join('\n')}
 
 User: ${userMessage}
 
-Provide a supportive, natural response as if you're speaking to the client in person.`
+Provide a response that matches the user's energy and emotional context. Keep it natural, warm, and professional.`
             }]
           }],
           generationConfig: {
-            temperature: 0.9,
+            temperature: 0.8,
             topK: 40,
-            topP: 0.8,
-          }
+            topP: 0.85,
+            maxOutputTokens: 1024,
+            stopSequences: ["User:"]
+          },
+          safetySettings: [
+            {
+              category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            }
+          ]
         })
       });
 
@@ -166,7 +227,6 @@ Provide a supportive, natural response as if you're speaking to the client in pe
 function App() {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Protected Route component
   const ProtectedRoute = ({ children }) => {
