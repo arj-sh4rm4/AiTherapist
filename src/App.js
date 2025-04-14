@@ -6,6 +6,7 @@ import JournalPage from './components/JournalPage';
 import NavBar from './components/NavBar';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
+import LandingPage from './components/landing/LandingPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from './firebase/config';
@@ -245,7 +246,7 @@ function App() {
           <NavBar />
           <main>
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route 
