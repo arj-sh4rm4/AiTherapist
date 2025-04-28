@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Mic, Sparkles, Globe2 } from 'lucide-react';
+import { MessageSquare, Mic, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Hero: React.FC = () => {
@@ -27,7 +27,7 @@ const Hero: React.FC = () => {
               Speak. Reflect. Heal.
             </p>
             <p className="text-lg text-gray-500 mb-8">
-              Free voice-based therapy in Hindi, English & Hinglish — powered by emotional intelligence.
+              Experience natural conversations with our advanced text-to-speech technology, powered by emotional intelligence.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
@@ -37,15 +37,6 @@ const Hero: React.FC = () => {
               >
                 <MessageSquare className="w-5 h-5" />
                 Start Chatting
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-pink-600 text-pink-600 hover:bg-pink-50 flex items-center gap-2 text-base"
-                onClick={() => navigate('/chat?mode=voice')}
-              >
-                <Mic className="w-5 h-5" />
-                Try Voice Therapy
               </Button>
             </div>
           </motion.div>
@@ -70,23 +61,6 @@ const Hero: React.FC = () => {
                     </h3>
                     <p className="text-gray-600">
                       Experience emotionally intelligent conversations that understand and respond to your feelings with genuine care.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Feature Card 2 */}
-              <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:scale-105">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-pink-100 rounded-lg">
-                    <Globe2 className="w-6 h-6 text-pink-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Speak Your Language
-                    </h3>
-                    <p className="text-gray-600">
-                      Communicate naturally in Hindi, English, or Hinglish - express yourself in the language you're most comfortable with.
                     </p>
                   </div>
                 </div>

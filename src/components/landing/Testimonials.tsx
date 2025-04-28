@@ -6,7 +6,7 @@ const testimonials = [
   {
     name: "Priya Sharma",
     role: "Working Professional",
-    content: "This AI therapist has been a game-changer for my mental well-being. Being able to express myself in Hinglish makes the conversations so natural and comfortable.",
+    content: "The voice interactions feel incredibly natural and human-like. It's like having a real conversation with someone who truly understands.",
     rating: 5
   },
   {

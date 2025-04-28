@@ -9,11 +9,6 @@ const features = [
     ourApp: true
   },
   {
-    name: "Hindi/Hinglish support",
-    otherApps: false,
-    ourApp: true
-  },
-  {
     name: "Emotional awareness",
     otherApps: false,
     ourApp: true

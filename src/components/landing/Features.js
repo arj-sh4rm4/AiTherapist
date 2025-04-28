@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, MessageSquare, BookOpen, Shield } from 'lucide-react';
+import { Brain, MessageSquare, BookOpen, Shield, Mic } from 'lucide-react';
 
 const features = [
   {
@@ -9,9 +9,9 @@ const features = [
     description: "Our AI understands and responds to your emotions with empathy and care."
   },
   {
-    icon: <MessageSquare className="w-12 h-12 text-pink-600" />,
-    title: "Multilingual Support",
-    description: "Speak freely in Hindi, English, or Hinglish - whatever feels most natural to you."
+    icon: <Mic className="w-12 h-12 text-pink-600" />,
+    title: "Advanced TTS",
+    description: "Experience natural, human-like conversations with our state-of-the-art text-to-speech technology."
   },
   {
     icon: <BookOpen className="w-12 h-12 text-pink-600" />,

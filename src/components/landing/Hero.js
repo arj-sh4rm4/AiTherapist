@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import TherapyImg from '@/assets/TherapyImg.jpg';
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Hero = () => {
           </h1>
           
           <p className="text-lg sm:text-xl text-gray-600 max-w-lg">
-            Free voice-based therapy in Hindi, English & Hinglish — powered by emotional intelligence.
+            Experience natural conversations with our advanced text-to-speech technology, powered by emotional intelligence.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -35,15 +36,6 @@ const Hero = () => {
             >
               Start My Free Session
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-pink-600 text-pink-600 hover:bg-pink-50 rounded-full px-8 py-6 text-lg transition-all duration-300"
-              onClick={() => navigate('/chat?mode=voice')}
-            >
-              Try Demo
             </Button>
           </div>
         </motion.div>
@@ -57,8 +49,12 @@ const Hero = () => {
         >
           <div className="bg-white/30 backdrop-blur-lg rounded-3xl p-8 shadow-xl">
             {/* Placeholder for illustration or Lottie animation */}
-            <div className="aspect-square bg-gradient-to-br from-pink-100 to-pink-200 rounded-2xl flex items-center justify-center">
-              <span className="text-4xl">🎙️</span>
+            <div className="aspect-square bg-gradient-to-br from-pink-100 to-pink-200 rounded-2xl flex items-center justify-center overflow-hidden">
+              <img 
+                src={TherapyImg} 
+                alt="AI Therapist Illustration" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
           

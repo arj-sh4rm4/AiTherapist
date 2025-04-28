@@ -38,20 +38,33 @@ const HomePage = () => (
   </div>
 );
 
-const ToolsPage = () => (
-  <div className="tools-container">
-    <h1>Coping Tools</h1>
-    <p>Coping tools feature coming soon...</p>
-    <Link to="/" className="back-button">Back to Home</Link>
-  </div>
-);
-
 const TherapistChat = ({ messages, isTyping, onNewMessage }) => {
   const { currentUser } = useAuth();
   const [isMuted, setIsMuted] = useState(false);
 
   const getAIResponse = async (userMessage, messageHistory) => {
     try {
+      const emergencyKeywords = [
+        'kill myself',
+        'want to die',
+        'suicide',
+        'end my life',
+        'panic attack',
+        'anxiety attack',
+        'emergency',
+        'help me',
+        'can\'t breathe',
+        'hurting myself'
+      ];
+
+      const isEmergency = emergencyKeywords.some(keyword => 
+        userMessage.toLowerCase().includes(keyword)
+      );
+
+      if (isEmergency) {
+        return `I'm here with you, and I want to help. You're not alone in this. Please know that your life is valuable and there are people who care about you. I strongly encourage you to call the emergency helpline at 988 right now. They have trained professionals who can provide immediate support. Would you like me to help you connect with emergency services?`;
+      }
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.REACT_APP_PALM_API_KEY}`, {
         method: 'POST',
         headers: {
@@ -158,7 +171,7 @@ Provide a response that matches the user's energy and emotional context. Keep it
         
         // Only speak if not muted
         if (!isMuted) {
-          console.log("Speaking response:", aiResponse); // Debug log
+          console.log("Speaking response:", aiResponse);
           speechService.speak(aiResponse);
         }
         
@@ -272,7 +285,6 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/tools" element={<ToolsPage />} />
             </Routes>
           </main>
         </div>

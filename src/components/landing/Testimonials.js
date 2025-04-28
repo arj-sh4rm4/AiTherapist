@@ -5,20 +5,20 @@ import { Star } from 'lucide-react';
 const testimonials = [
   {
     name: "Priya Sharma",
-    role: "College Student",
-    content: "The AI therapist helped me manage my anxiety during exams. It's like having a friend who truly understands.",
+    role: "Student",
+    content: "The voice interactions feel incredibly natural and human-like. It's like having a real conversation with someone who truly understands.",
     rating: 5
   },
   {
-    name: "Rahul Patel",
+    name: "Rahul Verma",
     role: "Software Engineer",
-    content: "I was skeptical at first, but the emotional intelligence of this AI is remarkable. It's helped me through some tough times.",
+    content: "The emotional intelligence of this AI therapist is remarkable. It helped me through a tough time when I needed someone to talk to.",
     rating: 5
   },
   {
-    name: "Ananya Gupta",
-    role: "Freelancer",
-    content: "Being able to speak in Hindi makes such a difference. It feels more natural and comfortable.",
+    name: "Anita Patel",
+    role: "Teacher",
+    content: "The journaling feature has been a game-changer for me. It helps me track my emotional progress and reflect on my journey.",
     rating: 5
   }
 ];

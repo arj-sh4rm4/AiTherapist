@@ -17,10 +17,6 @@ const faqs: FAQItem[] = [
     answer: "Yes, your privacy is our top priority. All conversations are encrypted and stored securely. We never share your data with third parties, and you can delete your conversation history at any time."
   },
   {
-    question: "Can I speak in multiple languages?",
-    answer: "Absolutely! Our AI therapist supports Hindi, English, and Hinglish. You can switch between languages at any time during your conversation."
-  },
-  {
     question: "Is this a replacement for professional therapy?",
     answer: "While our AI therapist provides emotional support, it's not a replacement for professional mental health care. We recommend consulting a licensed therapist for clinical conditions. Our AI is designed to complement professional care."
   },

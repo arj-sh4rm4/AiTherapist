@@ -41,12 +41,6 @@ const NavBar = () => {
       path: '/journal',
       icon: BookOpen,
       description: 'Write and track your thoughts'
-    },
-    {
-      name: 'Tools',
-      path: '/tools',
-      icon: Brain,
-      description: 'Access coping techniques'
     }
   ];
 
