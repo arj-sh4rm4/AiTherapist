@@ -1,8 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import TypingIndicator from './TypingIndicator';
-import EmergencyResources from './EmergencyResources';
+import EmergencyResponse from './EmergencyResponse';
 import { FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import speechService from '../utils/speechService';
+import VoiceInput from './VoiceInput';
+
+const EMERGENCY_KEYWORDS = [
+  'kill myself',
+  'want to die',
+  'suicide',
+  'end my life',
+  'panic attack',
+  'anxiety attack',
+  'emergency',
+  'help me',
+  'can\'t breathe',
+  'hurting myself'
+];
 
 const suggestedResponses = [
   {
@@ -23,11 +37,11 @@ const suggestedResponses = [
   }
 ];
 
-const ChatInterface = ({ messages, onSendMessage, isTyping }) => {
+const ChatInterface = ({ messages, onSendMessage, isTyping, isMuted, onMuteToggle }) => {
   const [inputText, setInputText] = useState('');
+  const [showEmergencyResponse, setShowEmergencyResponse] = useState(false);
   const messagesEndRef = useRef(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,25 +57,27 @@ const ChatInterface = ({ messages, onSendMessage, isTyping }) => {
     }
   }, [messages]);
 
+  const checkForEmergency = (text) => {
+    const lowerText = text.toLowerCase();
+    return EMERGENCY_KEYWORDS.some(keyword => lowerText.includes(keyword));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputText.trim()) {
+      if (checkForEmergency(inputText)) {
+        setShowEmergencyResponse(true);
+      }
       onSendMessage(inputText);
       setInputText('');
     }
   };
 
-  const showEmergencyResources = messages.some(message => 
-    message.content.toLowerCase().includes('suicide') ||
-    message.content.toLowerCase().includes('kill myself') ||
-    message.content.toLowerCase().includes('want to die')
-  );
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (!isMuted) {
-      speechService.stop();
-    }
+  const handleRequestMedicalAssistance = () => {
+    // Here you would implement the actual emergency response
+    // For now, we'll just show a message
+    onSendMessage("Emergency medical assistance has been requested. Help is on the way.");
+    setShowEmergencyResponse(false);
   };
 
   return (
@@ -70,14 +86,16 @@ const ChatInterface = ({ messages, onSendMessage, isTyping }) => {
         <h2>Chat Session</h2>
         <button 
           className="mute-button"
-          onClick={toggleMute}
+          onClick={() => onMuteToggle(!isMuted)}
           title={isMuted ? "Unmute" : "Mute"}
         >
           {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
         </button>
       </div>
-
-      {showEmergencyResources && <EmergencyResources />}
+      
+      {showEmergencyResponse && (
+        <EmergencyResponse onRequestMedicalAssistance={handleRequestMedicalAssistance} />
+      )}
       
       <div className="messages-container">
         {showSuggestions && messages.length === 0 ? (
@@ -122,9 +140,12 @@ const ChatInterface = ({ messages, onSendMessage, isTyping }) => {
           placeholder="Type your message..."
           disabled={isTyping}
         />
-        <button type="submit" disabled={isTyping || !inputText.trim()}>
-          {isTyping ? 'Thinking...' : 'Send'}
-        </button>
+        <div className="input-buttons">
+          <VoiceInput onMessageReceived={onSendMessage} />
+          <button type="submit" disabled={isTyping || !inputText.trim()}>
+            {isTyping ? 'Thinking...' : 'Send'}
+          </button>
+        </div>
       </form>
     </div>
   );
