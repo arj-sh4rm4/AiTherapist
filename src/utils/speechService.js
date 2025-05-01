@@ -8,37 +8,40 @@ class SpeechService {
     this.utteranceQueue = [];
     this.currentVoiceName = null;
     this.voicePreferences = [
-      // British English (most natural for therapy)
       { name: 'en-GB-SoniaNeural', lang: 'en-GB' },
       { name: 'en-GB-RyanNeural', lang: 'en-GB' },
       { name: 'en-GB-AbbiNeural', lang: 'en-GB' },
       { name: 'en-GB-AlfieNeural', lang: 'en-GB' },
-      
-      // Australian English (also very natural)
       { name: 'en-AU-NatashaNeural', lang: 'en-AU' },
       { name: 'en-AU-WilliamNeural', lang: 'en-AU' },
-      
-      // US English (if preferred)
       { name: 'en-US-JennyNeural', lang: 'en-US' },
       { name: 'en-US-GuyNeural', lang: 'en-US' }
     ];
+
+    // Character limit for the month (250,000 characters)
+    this.MAX_CHARACTERS = 250000;
+    this.usedCharacters = 0;
+    this.lastResetMonth = new Date().getMonth();
   }
 
   init() {
     if (this.speechConfig) return;
 
+    // Access the API key and region from the .env file
+    const AZURE_TTS_KEY = process.env.REACT_APP_AZURE_TTS_KEY;
+    const AZURE_TTS_REGION = process.env.REACT_APP_AZURE_TTS_REGION;
+
     // Initialize speech configuration with provided credentials
     this.speechConfig = speechsdk.SpeechConfig.fromSubscription(
-      '15vyptwwWpVzzJDYilzfLeBcefiA4O0IUg9BCpTlRGLXjpaTZZcMJQQJ99BDACGhslBXJ3w3AAAYACOG4nIY',
-      'centralindia'
+      AZURE_TTS_KEY,
+      AZURE_TTS_REGION
     );
 
     // Set default voice
     this.setVoice(this.voicePreferences[0].name);
-    
+
     // Configure audio output
-    this.speechConfig.speechSynthesisOutputFormat = 
-      speechsdk.SpeechSynthesisOutputFormat.Audio24Khz48KBitRateMonoMp3;
+    this.speechConfig.speechSynthesisOutputFormat = speechsdk.SpeechSynthesisOutputFormat.Audio24Khz48KBitRateMonoMp3;
 
     // Create synthesizer
     this.synthesizer = new speechsdk.SpeechSynthesizer(this.speechConfig);
@@ -75,6 +78,17 @@ class SpeechService {
       this.init();
     }
 
+    // Reset monthly usage if it's a new month
+    this.resetIfNewMonth();
+
+    const charCount = text.length;
+    if (this.usedCharacters + charCount > this.MAX_CHARACTERS) {
+      alert("TTS usage limit exceeded for the month.");
+      return;
+    }
+
+    this.usedCharacters += charCount;
+
     // Split text into natural segments
     const segments = this.splitIntoSegments(text);
     console.log("Split segments:", segments);
@@ -85,6 +99,14 @@ class SpeechService {
     // Start processing queue if not already speaking
     if (!this.isSpeaking) {
       this.processNextInQueue();
+    }
+  }
+
+  resetIfNewMonth() {
+    const currentMonth = new Date().getMonth();
+    if (currentMonth !== this.lastResetMonth) {
+      this.usedCharacters = 0; // Reset usage
+      this.lastResetMonth = currentMonth;
     }
   }
 
@@ -126,4 +148,4 @@ class SpeechService {
 
 // Create and export a single instance
 const speechService = new SpeechService();
-export default speechService; 
+export default speechService;
